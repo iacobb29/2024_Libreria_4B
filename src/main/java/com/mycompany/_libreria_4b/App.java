@@ -30,8 +30,14 @@ import utilita.TextFile;
 public class App 
 {
 
-    public static void main(String[] args) throws IOException 
+    public static void main(String[] args) throws IOException
     {
+            Libro l1 = new Libro("La divina Commedia", "Dante", 200);
+            Libro l2 = new Libro("La divina Commedia", "Dante", 200);
+            
+            System.out.println(l1.equals(l2));
+           
+        
         int numeroVociMenu=11;
         String[] vociMenu=new String[numeroVociMenu];
         int voceMenuScelta;
@@ -311,111 +317,36 @@ public class App
                     }
                     break;
                 
-                case 7: //Esporta CSV
-
-                    try 
+                case 7:
+                    try
                     {
-                        f1= new TextFile(nomeFileCSV,'W'); //Apro ill file in scrittura
-                        String datiVolume;
-                        for(int i=0;i<s1.getNumRipiani();i++)
-                        {
-                            for(int j=0;j<s1.getNumMaxLibri(i);j++)
-                            {
-                                try 
-                                {
-                                    lib=s1.getLibro(i, j);
-                                    datiVolume=i+";"+j+";"+lib.getTitolo()+";"+lib.getAutore()+";"+lib.getNumeroPagine();
-                                    f1.toFile(datiVolume);
-                                } 
-                                catch (EccezioneRipianoNonValido | EccezionePosizioneNonValida ex) 
-                                {
-                                        //Non succederà mai
-                                }                              
-                                catch (EccezionePosizioneVuota ex) 
-                                {
-                                        //non fare nulle, vai alla prossima posizione
-                                } catch (FileException ex) 
-                                {
-                                    //non succederà mai
-                                    //mostra il messaggio dell'eccezione
-                                    System.out.println(ex.toString());
-                                }
-                            }
-                        }
-                        f1.closeFile();  //Tutti i volumi sono statoi scritti
-                        System.out.println("Esportazione avvenuta correttamente.");
-                    } 
-                    catch (IOException ex) 
-                    {
-                        System.out.println("Impossibile accedere al file");
+                        //Esporta CSV
+                        s1.esportaCSV(nomeFileCSV);
+                        System.out.println("Volumi esportati correttamente");
                     }
-        
+                    catch(IOException ex)
+                    {
+                        System.out.println("Impossibile esportare su file");
+                    }
+                    
                     break;
                     
-                case 8: 
-                    String rigaLetta;
-                    String[] datiVolume;
-                    try 
+                case 8:
+                    try
                     {
-                        //Importa da CSV
-                        f1 = new TextFile(nomeFileCSV, 'R');
-                        do
-                        {
-                        try
-                        {
-                            rigaLetta = f1.fromFile();
-                            datiVolume = rigaLetta.split(";");
-                            ripiano = Integer.parseInt(datiVolume[0]);
-                            posizione = Integer.parseInt(datiVolume[1]);
-                            titolo = datiVolume[2];
-                            autore = datiVolume[3];
-                            numeroPagine = Integer.parseInt(datiVolume[4]);
-                            lib = new Libro(titolo, autore, numeroPagine);
-                            try 
-                            {
-                                s1.setLibro(lib, ripiano, posizione);
-                            } 
-                            catch (EccezioneRipianoNonValido ex) 
-                            {
-                                System.out.println("Errore: ripiano "+ripiano+ " non corretto per il volume "+titolo); 
-                            } 
-                            catch (EccezionePosizioneNonValida ex) 
-                            {
-                                System.out.println("Errore: posizione "+posizione+ " non corretto per il volume "+titolo); 
- 
-                            } 
-                            catch (EccezionePosizioneOccupata ex) 
-                            {
-                                System.out.println("Nel ripiano "+ripiano+ " e posizione "+posizione+" è già presente un altro volume. Il volume "+titolo+" non sarà posizionato nello scaffale"); 
-
-                            }
-
-                        }
-                         
-                    catch (FileException ex) 
-                    {
-                        f1.closeFile();
-                        System.out.println("Operazione completata");
-                        break;
-                        
+                       s1.importaDaCSV(nomeFileCSV); 
+                        System.out.println("Fine operazioni di caricamento");
                     }
-                        }while(true);
-                    }
-                    catch (IOException ex) 
+                    catch(IOException ex)
                     {
-                        System.out.println("Impossibile leggere da file");
-                    } 
-                    
-                      
+                        System.out.println("Errore: mpossibile importare da file CSV");
+                    }
                     break;
                     
                 case 9: //Serializzazione
                     try
                     {
-                        ObjectOutputStream writer = new ObjectOutputStream(new FileOutputStream (nomeFileBinario));
-                        writer.writeObject(s1);
-                        writer.flush();
-                        writer.close();
+                        s1.salvaDati(nomeFileBinario);
                         System.out.println("Operazione completata");
  
                     }
@@ -433,9 +364,7 @@ public class App
                 case 10: //Deserializzazione
                     try
                     {
-                        ObjectInputStream reader = new ObjectInputStream(new FileInputStream(nomeFileBinario));
-                        s1 = (Scaffale)reader.readObject(); 
-                        reader.close();
+                        s1 = s1.caricaDati(nomeFileBinario);
                         System.out.println("Caricamento avvenuto con successo");
                     }
                     
@@ -466,5 +395,7 @@ public class App
             }
         }while(voceMenuScelta!=0);
         
+
     }
 }
+

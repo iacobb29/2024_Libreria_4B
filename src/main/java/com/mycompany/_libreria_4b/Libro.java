@@ -94,6 +94,14 @@ public class Libro implements Serializable
         return p;
     }
     
+    public boolean equals(Object oggetto)
+    {
+        Libro lib=(Libro) oggetto; //cast a oggetto
+        return (this.titolo.equals(lib.getTitolo())&&this.autore.equals(lib.getAutore())&&this.numeroPagine==lib.getNumeroPagine());
+       
+        
+    }
+    
     /**
      * Restituisce una stringa che contiene i dati di un libro
      * @return 
